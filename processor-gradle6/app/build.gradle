@@ -2,17 +2,17 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 
-apply plugin: 'hipoom'
-hipoom {
-    registry {
-        interfaces = [
-                "com.hipoom.processor.TestInterface",
-                "androidx.appcompat.app.AppCompatCallback"
-        ]
-        needTrackSuperClassForInterface = false
-        annotations = ["com.hipoom.processor.TestAnnotation"]
-    }
-}
+//apply plugin: 'hipoom'
+//hipoom {
+//    registry {
+//        interfaces = [
+//                "com.hipoom.processor.TestInterface",
+//                "androidx.appcompat.app.AppCompatCallback"
+//        ]
+//        needTrackSuperClassForInterface = false
+//        annotations = ["com.hipoom.processor.TestAnnotation"]
+//    }
+//}
 
 android {
     compileSdkVersion 30
