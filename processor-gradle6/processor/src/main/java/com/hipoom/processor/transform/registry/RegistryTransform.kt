@@ -28,7 +28,7 @@ class RegistryTransform : Transform() {
     /* ======================================================= */
 
     companion object {
-        private val logger = Logger.of(TRANSFORM_NAME, "main")
+        private val logger = Logger.of(TRANSFORM_REGISTRY, "main")
     }
 
 
@@ -37,7 +37,7 @@ class RegistryTransform : Transform() {
     /* Override/Implements Methods                             */
     /* ======================================================= */
 
-    override fun getName() = TRANSFORM_NAME
+    override fun getName() = TRANSFORM_REGISTRY
 
     override fun getInputTypes(): MutableSet<QualifiedContent.ContentType> = TransformManager.CONTENT_CLASS
 

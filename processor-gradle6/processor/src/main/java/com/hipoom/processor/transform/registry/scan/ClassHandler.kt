@@ -5,7 +5,7 @@ import com.hipoom.processor.common.getInterfacesSafely
 import com.hipoom.processor.common.of
 import com.hipoom.processor.transform.registry.InputResult
 import com.hipoom.processor.transform.registry.RegistryTransformConfig
-import com.hipoom.processor.transform.registry.TRANSFORM_NAME
+import com.hipoom.processor.transform.registry.TRANSFORM_REGISTRY
 import javassist.ClassPool
 import javassist.CtClass
 import org.objectweb.asm.ClassReader
@@ -21,7 +21,7 @@ object ClassHandler {
     /* Fields                                                  */
     /* ======================================================= */
 
-    private val logger = Logger.of(TRANSFORM_NAME, "ClassHandler")
+    private val logger = Logger.of(TRANSFORM_REGISTRY, "ClassHandler")
 
 
 

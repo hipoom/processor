@@ -88,7 +88,7 @@ class TimingTransform : Transform() {
         PathHelper.appendPaths(transformInvocation)
 
         // 扫描所有输入
-        val scanRes = InputScanner.scan(config, transformInvocation)
+        val scanRes = InputScanner.scanAndCopy2Output(config, transformInvocation)
 
         // 将扫描得到的类信息插入到代码中
         CodeEditor.edit(scanRes, transformInvocation?.outputProvider!!)

@@ -9,7 +9,7 @@ import com.hipoom.processor.common.copyToOutput
 import com.hipoom.processor.common.of
 import com.hipoom.processor.transform.registry.InputResult
 import com.hipoom.processor.transform.registry.RegistryTransformConfig
-import com.hipoom.processor.transform.registry.TRANSFORM_NAME
+import com.hipoom.processor.transform.registry.TRANSFORM_REGISTRY
 import com.hipoom.processor.transform.registry.incremental.IncrementalCache
 import com.hipoom.processor.transform.registry.incremental.InputCache
 import java.util.jar.JarFile
@@ -25,7 +25,7 @@ object JarScanner {
     /* Fields                                                  */
     /* ======================================================= */
 
-    private val logger = Logger.of(TRANSFORM_NAME, "JarScan")
+    private val logger = Logger.of(TRANSFORM_REGISTRY, "JarScan")
 
 
 

@@ -5,7 +5,7 @@ import com.android.build.api.transform.TransformOutputProvider
 import com.hipoom.processor.common.JarEntryReplaceUtils
 import com.hipoom.processor.common.Logger
 import com.hipoom.processor.common.of
-import com.hipoom.processor.transform.registry.TRANSFORM_NAME
+import com.hipoom.processor.transform.registry.TRANSFORM_REGISTRY
 import com.hipoom.processor.transform.registry.incremental.IncrementalCache
 import com.hipoom.processor.transform.registry.scan.ScanResult
 import javassist.ClassPool
@@ -23,7 +23,7 @@ object CodeEditor {
     /* Fields                                                  */
     /* ======================================================= */
 
-    private val logger = Logger.of(TRANSFORM_NAME, "editor")
+    private val logger = Logger.of(TRANSFORM_REGISTRY, "editor")
 
 
 
