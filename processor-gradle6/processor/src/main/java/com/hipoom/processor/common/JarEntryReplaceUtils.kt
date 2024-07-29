@@ -15,7 +15,7 @@ object JarEntryReplaceUtils {
     /* Fields                                                  */
     /* ======================================================= */
 
-    private val logger = Logger.of("main", "replace")
+    private val logger = Logger.of("main", "JarEntryReplace")
 
 
 
@@ -31,6 +31,19 @@ object JarEntryReplaceUtils {
         logger.info("[replace] jar: " + jar.absolutePath)
         logger.info("[replace] entryName: $entryName")
 
+        // 拼装成一个 map 走只有 1 个元素的批量替换
+        replaceAll(jar = jar, needReplaceEntries = mapOf(entryName to entryBytes))
+    }
+
+    /**
+     * 批量替换 [jar] 包中的所有 [needReplaceEntries] 元素。
+     * 其中，[needReplaceEntries] 的 Key 是 entryName，Value 是 entryBytes.
+     *
+     * 这个方法会修改 [jar] 文件的内容，而不是生成一个新的 jar.
+     */
+    fun replaceAll(jar: File, needReplaceEntries: Map<String, ByteArray>) {
+        logger.info("[replaceAll] jar: " + jar.absolutePath)
+
         // 临时文件
         val temp = File(jar.absolutePath + ".tmp")
 
@@ -44,16 +57,16 @@ object JarEntryReplaceUtils {
         while (entries.hasMoreElements()) {
             val entry = entries.nextElement()
 
-            // 找到后，
-            if (entry.name == entryName) {
+            // 如果 entry 需要被替换
+            if (needReplaceEntries.containsKey(entry.name)) {
                 // 写入新的 entry
-                val newEntry = JarEntry(entryName)
+                val newEntry = JarEntry(entry.name)
                 output.putNextEntry(newEntry)
-                output.write(entryBytes)
+                needReplaceEntries[entry.name]?.let { output.write(it) }
                 continue
             }
 
-            // 拷贝元素
+            // 如果 entry 不需要被替换，拷贝元素
             output.putNextEntry(entry)
             old.getInputStream(entry).copyTo(output)
         }
@@ -61,5 +74,4 @@ object JarEntryReplaceUtils {
         output.close()
         jar.delete() && temp.renameTo(jar)
     }
-
 }

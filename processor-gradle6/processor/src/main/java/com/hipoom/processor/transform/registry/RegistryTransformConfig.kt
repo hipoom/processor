@@ -33,6 +33,7 @@ class RegistryTransformConfig {
 
     /**
      * 在处理 interfaces 时，是否需要回溯每一个类的所有父类。
+     *
      * 如果 class Child 继承自 class Base, 且 class Base implements InterfaceC,
      * 那么当设置 needTrackSuperClassForInterface == true 时， class Child 会被加入到 Registry 中，
      * 而 needTrackSuperClassForInterface == false 时，则不会被加入到 Registry 中。

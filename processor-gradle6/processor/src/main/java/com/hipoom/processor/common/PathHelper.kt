@@ -1,9 +1,7 @@
-package com.hipoom.processor.transform.registry
+package com.hipoom.processor.common
 
 import com.android.build.api.transform.TransformInvocation
 import com.hipoom.processor.appExtension
-import com.hipoom.processor.common.Logger
-import com.hipoom.processor.common.of
 import javassist.ClassPool
 import java.io.File
 
@@ -25,6 +23,9 @@ object PathHelper {
     /* Public Methods                                          */
     /* ======================================================= */
 
+    /**
+     * 这里现在可能会被调用多次，不确定是否会有异常。
+     */
     fun appendPaths(transformInvocation: TransformInvocation?) {
         val classPool = ClassPool.getDefault()
 

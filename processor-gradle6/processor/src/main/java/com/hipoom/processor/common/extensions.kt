@@ -4,6 +4,7 @@ package com.hipoom.processor.common
 import com.android.build.api.transform.DirectoryInput
 import com.android.build.api.transform.Format
 import com.android.build.api.transform.JarInput
+import com.android.build.api.transform.TransformInvocation
 import com.android.build.api.transform.TransformOutputProvider
 import javassist.CtClass
 import org.apache.commons.io.FileUtils
@@ -63,4 +64,29 @@ fun JarInput.copyToOutput(outputProvider: TransformOutputProvider) {
     )
     // 虽然不处理 Jar 中的类，但也需要复制到输出目录
     FileUtils.copyFile(file, output)
+}
+
+/**
+ * 直接将所有 inputs 都拷贝到 outputs 中。
+ * 不做修改。
+ */
+fun TransformInvocation.copyInputsToOutputs() {
+    this.inputs?.forEach { input ->
+        // 遍历每一个文件夹
+        input.directoryInputs.forEach { directory ->
+            directory.copyToOutput(this.outputProvider)
+        }
+
+        // 遍历每一个 Jar
+        input.jarInputs.forEach { jar ->
+            jar.copyToOutput(this.outputProvider)
+        }
+    }
+}
+
+fun measureTime(r: Runnable): Long {
+    val begin = System.currentTimeMillis()
+    r.run()
+    val end = System.currentTimeMillis()
+    return end - begin
 }
