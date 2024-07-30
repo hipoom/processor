@@ -3,6 +3,7 @@ package com.hipoom.processor
 import com.android.build.gradle.AppExtension
 import com.android.build.gradle.AppPlugin
 import com.hipoom.processor.transform.registry.RegistryTransform
+import com.hipoom.processor.transform.timing.TimingTransform
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.logging.LogLevel
@@ -44,5 +45,8 @@ class HipoomPlugin : Plugin<Project> {
 
         // 注册 transform: RegistryTransform
         appExtension.registerTransform(RegistryTransform())
+
+        // 注册 transform: TimingTransform
+        appExtension.registerTransform(TimingTransform())
     }
 }

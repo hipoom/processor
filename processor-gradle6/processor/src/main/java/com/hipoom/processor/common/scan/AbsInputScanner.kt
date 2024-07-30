@@ -20,7 +20,7 @@ abstract class AbsInputScanner {
     /* Fields                                                  */
     /* ======================================================= */
 
-    private val logger by lazy { Logger.of("main", "scan") }
+    abstract val logger: Logger
 
 
 
@@ -33,6 +33,8 @@ abstract class AbsInputScanner {
      * Directory 和 Jar 都会在回调完模板方法后，copy 到 output 中。
      */
     fun scanAndCopyToOutput(transformInvocation: TransformInvocation?) {
+        logger.info("[scanAndCopyToOutput] begin.")
+
         // 遍历每一个输入
         transformInvocation?.inputs?.forEach { input ->
             // 遍历这个 input 下的所有文件夹。
@@ -41,6 +43,7 @@ abstract class AbsInputScanner {
             scanJar(transformInvocation, input)
         }
 
+        logger.info("[scanAndCopyToOutput] end.")
         logger.flush()
     }
 

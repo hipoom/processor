@@ -26,7 +26,7 @@ class TimingTransform : Transform() {
     /* ======================================================= */
 
     companion object {
-        private val logger = Logger.of(TRANSFORM_NAME, "main")
+        private val logger = Logger.of(TRANSFORM_TIMING, "main")
     }
 
 
@@ -60,7 +60,7 @@ class TimingTransform : Transform() {
         val cost = measureTime {
             onTransform(transformInvocation, configs)
         }
-        logger.info("耗时： $cost 毫秒")
+        logger.info("TimingTransform 耗时： $cost 毫秒")
 
         // 所有日志写入文件。
         Logger.flushAll()
@@ -88,9 +88,6 @@ class TimingTransform : Transform() {
         PathHelper.appendPaths(transformInvocation)
 
         // 扫描所有输入
-        val scanRes = TimingScanner(config).scanAndCopyToOutput(config, transformInvocation)
-
-        // 将扫描得到的类信息插入到代码中
-        CodeEditor.edit(scanRes, transformInvocation?.outputProvider!!)
+        TimingScanner(config).scanAndCopyToOutput(transformInvocation)
     }
 }

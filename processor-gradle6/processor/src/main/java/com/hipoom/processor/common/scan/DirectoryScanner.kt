@@ -18,7 +18,7 @@ class DirectoryScanner {
     /* Fields                                                  */
     /* ======================================================= */
 
-    private val logger = Logger.of(TRANSFORM_TIMING, "DirScan")
+    private val logger = Logger.of("main", "DirScan")
 
     /**
      * 文件过滤器，返回 true 表示需要被拦截，不执行下一步。
@@ -64,6 +64,8 @@ class DirectoryScanner {
         if (filter != null && filter.needIgnore(file)) {
             return
         }
+
+        logger.info("处理文件: " + file.absolutePath)
 
         // 获取文件流
         val inputStream = file.inputStream()

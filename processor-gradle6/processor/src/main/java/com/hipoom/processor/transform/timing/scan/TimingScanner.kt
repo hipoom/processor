@@ -3,11 +3,14 @@
 package com.hipoom.processor.transform.timing.scan
 
 import com.android.build.api.transform.JarInput
+import com.hipoom.processor.common.Logger
+import com.hipoom.processor.common.of
 import com.hipoom.processor.common.scan.AbsInputScanner
 import com.hipoom.processor.common.scan.filter.JarEntryFilter
 import com.hipoom.processor.common.scan.filter.defaultFileFilter
 import com.hipoom.processor.transform.registry.incremental.IncrementalCache
 import com.hipoom.processor.transform.registry.scan.JarScanner
+import com.hipoom.processor.transform.timing.TRANSFORM_TIMING
 import com.hipoom.processor.transform.timing.TimingConfig
 import java.io.FileInputStream
 import java.util.jar.JarEntry
@@ -19,6 +22,14 @@ import java.util.jar.JarFile
  *
  */
 class TimingScanner(private val timingConfig: TimingConfig?): AbsInputScanner() {
+
+    /* ======================================================= */
+    /* Fields                                                  */
+    /* ======================================================= */
+    override val logger: Logger
+        get() = Logger.of(TRANSFORM_TIMING, "scan")
+
+
 
     /* ======================================================= */
     /* Override/Implements Methods                             */
@@ -83,6 +94,8 @@ class TimingScanner(private val timingConfig: TimingConfig?): AbsInputScanner() 
         if (!entryName.endsWith(".class")) {
             return
         }
+
+        logger.info("处理 entry: $entryName")
 
         val inputStream = jarFile.getInputStream(entry)
         ClassHandler.handleClass(timingConfig, inputStream)
