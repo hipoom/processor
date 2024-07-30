@@ -1,9 +1,10 @@
-package com.hipoom.processor.transform.timing.scan
+package com.hipoom.processor.common.scan
 
 import com.android.build.api.transform.DirectoryInput
 import com.hipoom.processor.common.Logger
 import com.hipoom.processor.common.of
 import com.hipoom.processor.transform.timing.TRANSFORM_TIMING
+import com.hipoom.processor.common.scan.filter.FileFilter
 import java.io.File
 import java.io.FileInputStream
 

@@ -1,11 +1,9 @@
-package com.hipoom.processor.transform.timing.scan
+package com.hipoom.processor.common.scan
 
 import com.android.build.api.transform.JarInput
 import com.android.build.api.transform.Status
 import com.hipoom.processor.common.Logger
 import com.hipoom.processor.common.of
-import com.hipoom.processor.transform.timing.TRANSFORM_TIMING
-import com.hipoom.processor.transform.timing.TimingConfig
 
 /**
  * @author ZhengHaiPeng
@@ -18,7 +16,7 @@ class JarScanner {
     /* Fields                                                  */
     /* ======================================================= */
 
-    private val logger = Logger.of(TRANSFORM_TIMING, "JarScan")
+    private val logger = Logger.of("main", "JarScan")
 
     /**
      * 没有变化的 Jar 包的处理逻辑。
@@ -46,7 +44,7 @@ class JarScanner {
     /* Public Methods                                          */
     /* ======================================================= */
 
-    fun scan(configs: TimingConfig, jar: JarInput) {
+    fun scan(jar: JarInput) {
         logger.info("处理 Jar 包：${jar.file.absolutePath}")
         scanJar(jar)
     }

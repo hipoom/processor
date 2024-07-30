@@ -12,7 +12,7 @@ import com.hipoom.processor.common.flushAll
 import com.hipoom.processor.common.measureTime
 import com.hipoom.processor.common.of
 import com.hipoom.processor.project
-import com.hipoom.processor.transform.timing.scan.InputScanner
+import com.hipoom.processor.transform.timing.scan.TimingScanner
 
 /**
  * @author ZhengHaiPeng
@@ -35,7 +35,7 @@ class TimingTransform : Transform() {
     /* Override/Implements Methods                             */
     /* ======================================================= */
 
-    override fun getName() = TRANSFORM_NAME
+    override fun getName() = TRANSFORM_TIMING
 
     override fun getInputTypes(): MutableSet<QualifiedContent.ContentType> = TransformManager.CONTENT_CLASS
 
@@ -82,13 +82,13 @@ class TimingTransform : Transform() {
 
     private fun onTransform(
         transformInvocation: TransformInvocation?,
-        config: TimingConfig
+        config: TimingConfig?
     ) {
         // 添加类的搜索路径到 Global.classPool 中
         PathHelper.appendPaths(transformInvocation)
 
         // 扫描所有输入
-        val scanRes = InputScanner.scanAndCopy2Output(config, transformInvocation)
+        val scanRes = TimingScanner(config).scanAndCopyToOutput(config, transformInvocation)
 
         // 将扫描得到的类信息插入到代码中
         CodeEditor.edit(scanRes, transformInvocation?.outputProvider!!)

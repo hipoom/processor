@@ -2,7 +2,7 @@ package com.hipoom.processor.transform.timing.scan
 
 import com.hipoom.processor.common.Logger
 import com.hipoom.processor.common.of
-import com.hipoom.processor.transform.timing.TRANSFORM_NAME
+import com.hipoom.processor.transform.timing.TRANSFORM_TIMING
 import com.hipoom.processor.transform.timing.TimingConfig
 import javassist.ClassPool
 import javassist.CtClass
@@ -19,7 +19,7 @@ object ClassHandler {
     /* Fields                                                  */
     /* ======================================================= */
 
-    private val logger = Logger.of(TRANSFORM_NAME, "ClassHandler")
+    private val logger = Logger.of(TRANSFORM_TIMING, "ClassHandler")
 
 
 
@@ -32,7 +32,7 @@ object ClassHandler {
      *
      * @param inputStream class 对应的输入流。
      */
-    fun handleClass(configs: TimingConfig, inputStream: InputStream) {
+    fun handleClass(configs: TimingConfig?, inputStream: InputStream) {
         // 读取类信息
         val reader = ClassReader(inputStream)
         val className = reader.className.replace('/', '.')

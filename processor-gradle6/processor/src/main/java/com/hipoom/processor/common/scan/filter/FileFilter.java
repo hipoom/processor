@@ -1,4 +1,4 @@
-package com.hipoom.processor.transform.timing.scan;
+package com.hipoom.processor.common.scan.filter;
 
 import java.io.File;
 
