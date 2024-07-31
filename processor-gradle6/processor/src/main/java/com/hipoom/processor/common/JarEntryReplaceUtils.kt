@@ -44,6 +44,11 @@ object JarEntryReplaceUtils {
     fun replaceAll(jar: File, needReplaceEntries: Map<String, ByteArray>) {
         logger.info("[replaceAll] jar: " + jar.absolutePath)
 
+        if (!jar.exists()) {
+            logger.info("[replaceAll] 输入的文件不存在：$jar")
+            return
+        }
+
         // 临时文件
         val temp = File(jar.absolutePath + ".tmp")
 

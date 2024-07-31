@@ -93,6 +93,8 @@ object CodeEditor {
         logger.info("包含 Registry 类的 jar 包的输入路径为：${IncrementalCache.jarContainsRegistry?.file?.absolutePath}")
         logger.info("包含 Registry 类的 jar 包的输出路径为：${output}")
 
+        // TODO: 这里需要把 input 复制到 output 吗？
+
         JarEntryReplaceUtils.replace(
             jar = output,
             entryName = "com/hipoom/registry/Registry.class",

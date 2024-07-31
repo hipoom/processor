@@ -88,7 +88,7 @@ class RegistryTransform : Transform() {
             val stringWriter = StringWriter()
             val writer = PrintWriter(stringWriter)
             e.printStackTrace(writer)
-            logger.warn("【异常】：$writer")
+            logger.warn("【异常】：$stringWriter")
         }
     }
 
