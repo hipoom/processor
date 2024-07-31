@@ -15,6 +15,9 @@ import com.hipoom.processor.project
 import com.hipoom.processor.transform.registry.edit.CodeEditor
 import com.hipoom.processor.transform.registry.incremental.IncrementalCache
 import com.hipoom.processor.transform.registry.scan.InputScanner
+import java.io.PrintStream
+import java.io.PrintWriter
+import java.io.StringWriter
 
 /**
  * @author ZhengHaiPeng
@@ -47,40 +50,46 @@ class RegistryTransform : Transform() {
 
     override fun transform(transformInvocation: TransformInvocation?) {
         super.transform(transformInvocation)
+        try {
+            logger.info("RegistryTransform 开始执行了.")
 
-        logger.info("RegistryTransform 开始执行了.")
+            // 加载缓存
+            IncrementalCache.load()
 
-        // 加载缓存
-        IncrementalCache.load()
+            // 读取用户的配置
+            val configs = readConfigs()
+            logger.info("=========================")
+            logger.info("读取到的配置是")
+            logger.info("-------------------------")
+            val json = Gson().toJson(configs)
+            logger.info("\n$json")
+            logger.info("=========================")
 
-        // 读取用户的配置
-        val configs = readConfigs()
-        logger.info("=========================")
-        logger.info("读取到的配置是")
-        logger.info("-------------------------")
-        val json = Gson().toJson(configs)
-        logger.info("\n$json")
-        logger.info("=========================")
+            // 如果配置是空的，不做处理，直接将 input 拷贝到 output
+            if (configs == null) {
+                transformInvocation?.copyInputsToOutputs()
+                Logger.flushAll()
+                return
+            }
 
-        // 如果配置是空的，不做处理，直接将 input 拷贝到 output
-        if (configs == null) {
-            transformInvocation?.copyInputsToOutputs()
+            // 开始执行 transform
+            val begin = System.currentTimeMillis()
+            onTransform(transformInvocation, configs)
+            val end = System.currentTimeMillis()
+            val cost = end - begin
+            logger.info("耗时： $cost 毫秒")
+
+            // 保存配置
+            IncrementalCache.store(configs)
+
+            // 所有日志写入文件。
             Logger.flushAll()
-            return
+        } catch (e: Exception) {
+            val stringWriter = StringWriter()
+            val writer = PrintWriter(stringWriter)
+            e.printStackTrace(writer)
+            logger.warn("【异常】：$writer")
         }
-
-        // 开始执行 transform
-        val begin = System.currentTimeMillis()
-        onTransform(transformInvocation, configs)
-        val end = System.currentTimeMillis()
-        val cost = end - begin
-        logger.info("耗时： $cost 毫秒")
-
-        // 保存配置
-        IncrementalCache.store(configs)
-
-        // 所有日志写入文件。
-        Logger.flushAll()
     }
 
 

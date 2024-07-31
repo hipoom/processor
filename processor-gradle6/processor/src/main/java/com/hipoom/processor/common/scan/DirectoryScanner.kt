@@ -31,11 +31,14 @@ class DirectoryScanner {
     /* Public Methods                                          */
     /* ======================================================= */
 
-    fun scan(directory: DirectoryInput, handler: (FileInputStream)->Unit) {
-        logger.info("处理文件夹：${directory.file.absolutePath}")
+    /**
+     * [handler] 中的 [FileInputStream] 会自动关闭。
+     */
+    fun scan(directory: File, handler: (FileInputStream)->Unit) {
+        logger.info("处理文件夹：${directory.absolutePath}")
 
         // 遍历当前文件夹下的所有类，并逐一处理
-        directory.file?.listFiles()?.forEach { file ->
+        directory.listFiles()?.forEach { file ->
             scanDirectory(file, handler)
         }
     }
@@ -72,5 +75,8 @@ class DirectoryScanner {
 
         // 处理这个类
         handler(inputStream)
+
+        // 关闭文件流
+        inputStream.close()
     }
 }

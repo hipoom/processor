@@ -12,6 +12,7 @@ import com.hipoom.processor.transform.registry.incremental.IncrementalCache
 import com.hipoom.processor.transform.registry.scan.JarScanner
 import com.hipoom.processor.transform.timing.TRANSFORM_TIMING
 import com.hipoom.processor.transform.timing.TimingConfig
+import java.io.File
 import java.io.FileInputStream
 import java.util.jar.JarEntry
 import java.util.jar.JarFile
@@ -39,8 +40,12 @@ class TimingScanner(private val timingConfig: TimingConfig?): AbsInputScanner() 
 
     override fun getFileFilter() = defaultFileFilter
 
-    override fun onVisitFile(fileInputStream: FileInputStream) {
-        ClassHandler.handleClass(timingConfig, fileInputStream)
+    override fun onVisitFile(fileInputStream: FileInputStream, outputDirectory: File): Boolean {
+        return ClassHandler.handleClass(
+            configs         = timingConfig,
+            fileInputStream = fileInputStream,
+            outputDirectory = outputDirectory
+        )
     }
 
     override fun needScanJar() = true
@@ -98,6 +103,6 @@ class TimingScanner(private val timingConfig: TimingConfig?): AbsInputScanner() 
         logger.info("处理 entry: $entryName")
 
         val inputStream = jarFile.getInputStream(entry)
-        ClassHandler.handleClass(timingConfig, inputStream)
+        // ClassHandler.handleClass(timingConfig, inputStream)
     }
 }

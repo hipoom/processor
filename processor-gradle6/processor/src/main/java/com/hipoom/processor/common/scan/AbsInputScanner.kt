@@ -1,13 +1,14 @@
 package com.hipoom.processor.common.scan
 
+import com.android.build.api.transform.Format
 import com.android.build.api.transform.JarInput
 import com.android.build.api.transform.TransformInput
 import com.android.build.api.transform.TransformInvocation
 import com.hipoom.processor.common.Logger
 import com.hipoom.processor.common.copyToOutput
-import com.hipoom.processor.common.of
 import com.hipoom.processor.common.scan.filter.FileFilter
 import com.hipoom.processor.common.scan.filter.JarEntryFilter
+import java.io.File
 import java.io.FileInputStream
 
 /**
@@ -61,17 +62,21 @@ abstract class AbsInputScanner {
         val scanner = DirectoryScanner()
         scanner.fileFilter = getFileFilter()
 
-        // 遍历每一个 directory
+        // 遍历每一个输入的 directory
         input.directoryInputs.forEach { directory ->
+            logger.info("当前处理文件夹：" + directory.file.absolutePath)
 
-            // 遍历这个 directory 下的所有文件
-            scanner.scan(directory) {
+            val outputDirectory = directory.copyToOutput(transformInvocation.outputProvider)
+            logger.info("以拷贝到输出目录：" + outputDirectory.absolutePath)
+
+            // 遍历输出目录下的所有文件(夹)
+            scanner.scan(outputDirectory) {
                 // 将遇到的每一个文件，返回给子类去处理
-                onVisitFile(it)
+                onVisitFile(
+                    fileInputStream = it,
+                    outputDirectory = outputDirectory
+                )
             }
-
-            // 将处理好的结果，拷贝到输出目的地
-            directory.copyToOutput(transformInvocation.outputProvider)
         }
     }
 
@@ -113,9 +118,14 @@ abstract class AbsInputScanner {
     /**
      * 遍历文件夹遇到文件时的回调。
      * 如果文件已经被 FileFilter 过滤了，则不会回调到这里。
+     *
+     * @param fileInputStream 待处理的文件。
+     * @param outputDirectory 输出文件夹。
+     *
+     * @return 是否已经自行将 input 输出到 output 了。
      */
-    protected open fun onVisitFile(fileInputStream: FileInputStream) {
-
+    protected open fun onVisitFile(fileInputStream: FileInputStream, outputDirectory: File): Boolean {
+        return false
     }
 
     /**

@@ -4,14 +4,14 @@ apply plugin: 'kotlin-android-extensions'
 
 apply plugin: 'hipoom'
 hipoom {
-//    registry {
-//        interfaces = [
-//                "com.hipoom.processor.TestInterface",
-//                "androidx.appcompat.app.AppCompatCallback"
-//        ]
-//        needTrackSuperClassForInterface = false
-//        annotations = ["com.hipoom.processor.TestAnnotation"]
-//    }
+    registry {
+        interfaces = [
+                "com.hipoom.processor.TestInterface",
+                "androidx.appcompat.app.AppCompatCallback"
+        ]
+        needTrackSuperClassForInterface = false
+        annotations = ["com.hipoom.processor.TestAnnotation"]
+    }
 }
 
 android {

@@ -8,6 +8,7 @@ import com.android.build.api.transform.TransformInvocation
 import com.android.build.api.transform.TransformOutputProvider
 import javassist.CtClass
 import org.apache.commons.io.FileUtils
+import java.io.File
 import java.io.PrintWriter
 import java.io.StringWriter
 
@@ -41,7 +42,7 @@ fun Throwable.toTraceString(): String {
 }
 
 
-fun DirectoryInput.copyToOutput(outputProvider: TransformOutputProvider) {
+fun DirectoryInput.copyToOutput(outputProvider: TransformOutputProvider): File {
     // 获取输出路径
     val output = outputProvider.getContentLocation(
         name,
@@ -49,8 +50,11 @@ fun DirectoryInput.copyToOutput(outputProvider: TransformOutputProvider) {
         scopes,
         Format.DIRECTORY
     )
+
     // 将修改后的文件夹复制到输出路径
     FileUtils.copyDirectory(file, output)
+
+    return output
 }
 
 
