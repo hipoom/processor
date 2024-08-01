@@ -15,6 +15,13 @@ hipoom {
 
     timing {
         enable = true
+
+//        blacklist {
+//            // 官方库中的类，不参与插桩，提高效率
+//            prefix = ["kotlin.", "kotlinx.", "com.android.", "androidx."]
+//            // 类似于 .R$id、.R$layout 这些类，不参与插桩
+//            contains = [".R\$"]
+//        }
     }
 }
 

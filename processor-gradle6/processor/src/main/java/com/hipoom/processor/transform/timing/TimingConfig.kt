@@ -1,5 +1,8 @@
 package com.hipoom.processor.transform.timing
 
+import com.hipoom.processor.transform.registry.RegistryTransformConfig
+import com.hipoom.processor.transform.timing.config.BlackListConfig
+
 /**
  * @author ZhengHaiPeng
  * @since 2024/7/29 21:33
@@ -19,5 +22,9 @@ open class TimingConfig {
     /**
      * 类的全类名的前缀，如果满足 [blackList] 中的任意一个，就不会插桩。
      */
-    var blackList: Set<String>? = null
+    var blacklist = BlackListConfig()
+
+    fun blacklist(block: org.gradle.api.Action<BlackListConfig>) {
+        block.execute(blacklist)
+    }
 }

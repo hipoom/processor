@@ -52,15 +52,8 @@ object DirectoryClassHandler {
         log("handleClass", "outputDirectory: " + outputDirectory.absolutePath)
         increaseIndent()
 
-        // 跳过 .R$id、.R$layout 等等...
-        if (className.contains(".R\$")) {
-            log("handleClass", "忽略名字中有 .R$ 的类.")
-            decreaseIndent()
-            return false
-        }
-
         // 忽略系统的类
-        if (needIgnoreClassWithName(className)) {
+        if (needIgnoreClassWithName(configs, className)) {
             log("handleClass", "忽略以 'kotlin.'、 'com.android.' 等开头的类.")
             decreaseIndent()
             return false
@@ -91,7 +84,7 @@ object DirectoryClassHandler {
         log("handleClass", "即将处理类：$callableClassName")
         var hasModified = false
         tempCls.declaredMethods?.forEach {
-            hasModified = hasModified || onVisitMethod(configs, tempCls, it)
+            hasModified = hasModified || onVisitMethod(tempCls, it)
         }
 
         // 如果有修改，写入到文件中
@@ -117,22 +110,37 @@ object DirectoryClassHandler {
     /**
      * 判断 [className] 对应的类，是否需要忽略掉。例如 android、 java、 kotlin 自带的一些类，不需要再插桩了。
      */
-    private fun needIgnoreClassWithName(className: String): Boolean {
-        return listOf(
-            "kotlin.",
-            "kotlinx.",
-            "com.android.",
-            "androidx.",
-            "com.hipoom.performance.timing.TimingRecorder"
-        ).any {
+    private fun needIgnoreClassWithName(configs: TimingConfig?, className: String): Boolean {
+        increaseIndent()
+
+        val isPrefixMatched = configs?.blacklist?.prefix?.any {
             className.startsWith(it)
+        } ?: false
+
+        if (isPrefixMatched) {
+            log("needIgnoreClassWithName", "前缀符合忽略条件.")
+            decreaseIndent()
+            return true
         }
+
+        val isContainsKeyWord = configs?.blacklist?.contains?.any {
+            className.contains(it)
+        } ?: false
+
+        if (isContainsKeyWord) {
+            log("needIgnoreClassWithName", "包含需要忽略的关键字，符合忽略条件.")
+            decreaseIndent()
+            return true
+        }
+
+        decreaseIndent()
+        return false
     }
 
     /**
      * @return 是否修改了 [ctMethod] .
      */
-    private fun onVisitMethod(configs: TimingConfig?, ctClass: CtClass, ctMethod: CtMethod): Boolean {
+    private fun onVisitMethod(ctClass: CtClass, ctMethod: CtMethod): Boolean {
         val name = ctMethod.name
         log("onVisitMethod", "处理: $name")
         increaseIndent()
