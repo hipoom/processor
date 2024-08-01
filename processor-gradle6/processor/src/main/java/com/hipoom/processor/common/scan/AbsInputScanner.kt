@@ -67,7 +67,13 @@ abstract class AbsInputScanner {
             logger.info("当前处理文件夹：" + directory.file.absolutePath)
 
             val outputDirectory = directory.copyToOutput(transformInvocation.outputProvider)
-            logger.info("以拷贝到输出目录：" + outputDirectory.absolutePath)
+            logger.info("已拷贝到输出目录：" + outputDirectory.absolutePath)
+
+            // 如果不需要扫描文件夹，结束。
+            if (!needScanDirectory()) {
+                logger.info("由于不需要扫描文件夹，放弃扫描.")
+                return@forEach
+            }
 
             // 遍历输出目录下的所有文件(夹)
             scanner.scan(outputDirectory) {
@@ -88,10 +94,20 @@ abstract class AbsInputScanner {
         scanner.changedJarHandler = { onVisitChangedJar(it) }
 
         input.jarInputs.forEach { jar ->
+            logger.info("当前处理Jar：" + jar.file.absolutePath)
+
+            val outputJar = jar.copyToOutput(transformInvocation.outputProvider)
+            logger.info("已拷贝到输出目录：" + outputJar.absolutePath)
+
+            // 如果不需要扫描文件夹，结束。
+            if (!needScanJar()) {
+                logger.info("由于不需要扫描 Jar，放弃扫描.")
+                return@forEach
+            }
+
             scanner.scan(
                 jar = jar
             )
-            jar.copyToOutput(transformInvocation.outputProvider)
         }
     }
 

@@ -6,10 +6,7 @@ import com.android.build.api.transform.JarInput
 import com.hipoom.processor.common.Logger
 import com.hipoom.processor.common.of
 import com.hipoom.processor.common.scan.AbsInputScanner
-import com.hipoom.processor.common.scan.filter.JarEntryFilter
 import com.hipoom.processor.common.scan.filter.defaultFileFilter
-import com.hipoom.processor.transform.registry.incremental.IncrementalCache
-import com.hipoom.processor.transform.registry.scan.JarScanner
 import com.hipoom.processor.transform.timing.TRANSFORM_TIMING
 import com.hipoom.processor.transform.timing.TimingConfig
 import java.io.File
@@ -36,19 +33,23 @@ class TimingScanner(private val timingConfig: TimingConfig?): AbsInputScanner() 
     /* Override/Implements Methods                             */
     /* ======================================================= */
 
-    override fun needScanDirectory() = true
+    override fun needScanDirectory(): Boolean {
+        return timingConfig?.enable == true
+    }
 
     override fun getFileFilter() = defaultFileFilter
 
     override fun onVisitFile(fileInputStream: FileInputStream, outputDirectory: File): Boolean {
-        return ClassHandler.handleClass(
+        return DirectoryClassHandler.handleClass(
             configs         = timingConfig,
             fileInputStream = fileInputStream,
             outputDirectory = outputDirectory
         )
     }
 
-    override fun needScanJar() = true
+    override fun needScanJar(): Boolean {
+        return timingConfig?.enable == true
+    }
 
     override fun getJarEntryFilter() = null
 
@@ -103,6 +104,8 @@ class TimingScanner(private val timingConfig: TimingConfig?): AbsInputScanner() 
         logger.info("处理 entry: $entryName")
 
         val inputStream = jarFile.getInputStream(entry)
-        // ClassHandler.handleClass(timingConfig, inputStream)
+
+
+        inputStream.close()
     }
 }

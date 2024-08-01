@@ -58,7 +58,7 @@ fun DirectoryInput.copyToOutput(outputProvider: TransformOutputProvider): File {
 }
 
 
-fun JarInput.copyToOutput(outputProvider: TransformOutputProvider) {
+fun JarInput.copyToOutput(outputProvider: TransformOutputProvider): File {
     // 获取输出路径
     val output = outputProvider.getContentLocation(
         file.absolutePath,
@@ -68,6 +68,8 @@ fun JarInput.copyToOutput(outputProvider: TransformOutputProvider) {
     )
     // 虽然不处理 Jar 中的类，但也需要复制到输出目录
     FileUtils.copyFile(file, output)
+
+    return output
 }
 
 /**

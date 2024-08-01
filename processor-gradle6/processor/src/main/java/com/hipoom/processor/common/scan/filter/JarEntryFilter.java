@@ -16,6 +16,9 @@ public interface JarEntryFilter {
 
     /**
      * 是否需要忽略遍历时遇到的 jar 包中的 Entry.
+     *
+     * @param entry 需要判断的 JarEntry.
+     * @return 如果需要忽略，返回 true.
      */
     boolean needIgnore(@NonNull JarEntry entry);
 }

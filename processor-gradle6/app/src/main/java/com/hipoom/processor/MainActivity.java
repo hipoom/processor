@@ -12,12 +12,7 @@ public class MainActivity extends AppCompatActivity implements TestInterface {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        if (randomBoolean()) {
-            Log.i("ZHP_TEST", "随机 true.");
-        } else {
-            Log.i("ZHP_TEST", "随机 false.");
-        }
+        new Test().test();
     }
 
 

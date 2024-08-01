@@ -16,6 +16,9 @@ public interface FileFilter {
 
     /**
      * 是否需要忽略遍历时遇到的文件。
+     *
+     * @param file 待判断的文件。
+     * @return 是否需要忽略这个文件。
      */
     boolean needIgnore(@NonNull File file);
 

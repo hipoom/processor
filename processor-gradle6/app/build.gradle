@@ -12,6 +12,10 @@ hipoom {
         needTrackSuperClassForInterface = false
         annotations = ["com.hipoom.processor.TestAnnotation"]
     }
+
+    timing {
+        enable = true
+    }
 }
 
 android {

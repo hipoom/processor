@@ -11,13 +11,12 @@ import javassist.Modifier
 import org.objectweb.asm.ClassReader
 import java.io.File
 import java.io.FileInputStream
-import java.io.InputStream
 
 /**
  * @author ZhengHaiPeng
  * @since 2024/7/28 10:41 上午
  */
-object ClassHandler {
+object DirectoryClassHandler {
 
     /* ======================================================= */
     /* Fields                                                  */
@@ -92,13 +91,16 @@ object ClassHandler {
         log("handleClass", "即将处理类：$callableClassName")
         var hasModified = false
         tempCls.declaredMethods?.forEach {
-            hasModified = hasModified || onVisitMethod(tempCls, it)
+            hasModified = hasModified || onVisitMethod(configs, tempCls, it)
         }
 
         // 如果有修改，写入到文件中
         if (hasModified) {
             log("handleClass", "将修改后的 class 写入到文件中： ${outputDirectory.absolutePath}")
             tempCls.writeFile(outputDirectory.absolutePath)
+
+            // detach 非常重要，避免出现多次插桩的情况。
+            tempCls.detach()
         }
 
         decreaseIndent()
@@ -112,8 +114,17 @@ object ClassHandler {
     /* Private Methods                                         */
     /* ======================================================= */
 
+    /**
+     * 判断 [className] 对应的类，是否需要忽略掉。例如 android、 java、 kotlin 自带的一些类，不需要再插桩了。
+     */
     private fun needIgnoreClassWithName(className: String): Boolean {
-        return listOf("kotlin.", "kotlinx.", "com.android.", "androidx.").any {
+        return listOf(
+            "kotlin.",
+            "kotlinx.",
+            "com.android.",
+            "androidx.",
+            "com.hipoom.performance.timing.TimingRecorder"
+        ).any {
             className.startsWith(it)
         }
     }
@@ -121,7 +132,7 @@ object ClassHandler {
     /**
      * @return 是否修改了 [ctMethod] .
      */
-    private fun onVisitMethod(ctClass: CtClass, ctMethod: CtMethod): Boolean {
+    private fun onVisitMethod(configs: TimingConfig?, ctClass: CtClass, ctMethod: CtMethod): Boolean {
         val name = ctMethod.name
         log("onVisitMethod", "处理: $name")
         increaseIndent()
@@ -142,17 +153,26 @@ object ClassHandler {
             ctClass.defrost()
         }
 
-        try {
-            ctMethod.insertBefore("android.util.Log.i(\"插桩\", \"$name\" + \" 开始-->\");")
-            ctMethod.insertAfter("android.util.Log.i(\"插桩\", \"$name\" + \" 结束<--\");")
-        } catch (e: Exception) {
-            log("onVisitMethod", "异常：" + e.message)
-        }
-
+        // 开始编辑这个方法
+        onEditMethod(ctClass, ctMethod)
         log("onVisitMethod", "插入完毕.")
 
         decreaseIndent()
         return true
+    }
+
+    private fun onEditMethod(ctClass: CtClass, ctMethod: CtMethod) {
+        try {
+            val paramTypesDes = ctMethod.parameterTypes.map { it.simpleName }.joinToString { it }.removeSuffix(", ")
+
+            // <ClassName>.<MethodName>([<ParamType1>, <ParamType2>, ...])
+            val methodDescription = ctClass.simpleName + "." + ctMethod.name + "(${paramTypesDes})"
+
+            ctMethod.insertBefore("com.hipoom.performance.timing.TimingRecorder.push(\"${methodDescription}\");")
+            ctMethod.insertAfter("com.hipoom.performance.timing.TimingRecorder.pop();")
+        } catch (e: Exception) {
+            log("onVisitMethod", "异常：" + e.message)
+        }
     }
 
 

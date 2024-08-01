@@ -4,6 +4,7 @@ import com.android.build.api.transform.TransformInvocation
 import com.hipoom.processor.appExtension
 import javassist.ClassPool
 import java.io.File
+import java.util.LinkedList
 
 /**
  * @author ZhengHaiPeng
