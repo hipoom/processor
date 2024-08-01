@@ -73,7 +73,7 @@ class JarEntryClassHandler : AbsEditor() {
         log("handleClass", "即将处理类：$callableClassName")
         var hasModified = false
         tempCls.declaredMethods?.forEach {
-            hasModified = hasModified || onVisitMethod(tempCls, it)
+            hasModified = onVisitMethod(tempCls, it) || hasModified
         }
 
         // 如果有修改，写入到文件中

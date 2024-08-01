@@ -20,7 +20,7 @@ hipoom {
         blacklist.prefix = ["kotlin.", "kotlinx.", "com.android.", "androidx."]
 
         // 黑名单 - 类似于 .R$id、.R$layout 这些类，不参与插桩
-        blacklist.contains = [".R\$"]
+        blacklist.contains = [".R\$", "OnFramePopListener"]
     }
 }
 

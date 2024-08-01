@@ -70,11 +70,11 @@ public class TimingRecorder {
     */
    public static class Frame {
 
-      long beginTime;
+      public long beginTime;
 
-      long endTime;
+      public long endTime;
 
-      String methodDescription;
+      public String methodDescription;
 
    }
 
