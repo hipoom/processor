@@ -137,11 +137,8 @@ abstract class AbsInputScanner {
      *
      * @param fileInputStream 待处理的文件。
      * @param outputDirectory 输出文件夹。
-     *
-     * @return 是否已经自行将 input 输出到 output 了。
      */
-    protected open fun onVisitFile(fileInputStream: FileInputStream, outputDirectory: File): Boolean {
-        return false
+    protected open fun onVisitFile(fileInputStream: FileInputStream, outputDirectory: File) {
     }
 
     /**

@@ -1,4 +1,4 @@
-package com.hipoom.processor.transform.timing.scan
+package com.hipoom.processor.transform.timing.editor
 
 import com.hipoom.processor.common.Logger
 import com.hipoom.processor.common.of
@@ -43,7 +43,7 @@ object DirectoryClassHandler {
         configs: TimingConfig?,
         fileInputStream: FileInputStream,
         outputDirectory: File
-    ): Boolean {
+    ) {
         // 读取类信息
         val reader = ClassReader(fileInputStream)
         val className = reader.className.replace('/', '.')
@@ -56,7 +56,7 @@ object DirectoryClassHandler {
         if (needIgnoreClassWithName(configs, className)) {
             log("handleClass", "忽略以 'kotlin.'、 'com.android.' 等开头的类.")
             decreaseIndent()
-            return false
+            return
         }
 
         // 这里是解决内部类的类名包含$的问题，如果原始类名也包含$，则会出错(不考虑)
@@ -72,13 +72,13 @@ object DirectoryClassHandler {
         if (tempCls == null) {
             log("handleClass", "从 classPool 中找不到 $className 对应的类")
             decreaseIndent()
-            return false
+            return
         }
 
         if (tempCls.isInterface) {
             log("handleClass", "忽略接口.")
             decreaseIndent()
-            return false
+            return
         }
 
         log("handleClass", "即将处理类：$callableClassName")
@@ -98,7 +98,7 @@ object DirectoryClassHandler {
 
         decreaseIndent()
         logger.flush()
-        return hasModified
+        return
     }
 
 

@@ -9,6 +9,7 @@ import com.hipoom.processor.common.scan.AbsInputScanner
 import com.hipoom.processor.common.scan.filter.defaultFileFilter
 import com.hipoom.processor.transform.timing.TRANSFORM_TIMING
 import com.hipoom.processor.transform.timing.TimingConfig
+import com.hipoom.processor.transform.timing.editor.DirectoryClassHandler
 import java.io.File
 import java.io.FileInputStream
 import java.util.jar.JarEntry
@@ -39,8 +40,8 @@ class TimingScanner(private val timingConfig: TimingConfig?): AbsInputScanner() 
 
     override fun getFileFilter() = defaultFileFilter
 
-    override fun onVisitFile(fileInputStream: FileInputStream, outputDirectory: File): Boolean {
-        return DirectoryClassHandler.handleClass(
+    override fun onVisitFile(fileInputStream: FileInputStream, outputDirectory: File){
+        DirectoryClassHandler.handleClass(
             configs         = timingConfig,
             fileInputStream = fileInputStream,
             outputDirectory = outputDirectory
