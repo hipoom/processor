@@ -5,6 +5,7 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
+import java.util.List;
 import java.util.Stack;
 
 /**
@@ -21,6 +22,8 @@ public class TimingRecorder {
     * 记录调用的栈。
     */
    private static final ThreadLocal<Stack<Frame>> stacks = new ThreadLocal<>();
+
+   public static Listener onFramePopListener = null;
 
 
 
@@ -48,8 +51,12 @@ public class TimingRecorder {
       }
 
       Frame frame = stack.pop();
-      long duration = now - frame.beginTime;
-      Log.i("Timing", "方法 " + frame.methodDescription + " 执行耗时 " + duration + ".");
+      frame.endTime = now;
+
+      Listener listener = onFramePopListener;
+      if (listener != null) {
+         listener.onFramePop(frame);
+      }
    }
 
 
@@ -58,12 +65,21 @@ public class TimingRecorder {
    /* Inner Class                                             */
    /* ======================================================= */
 
-   private static class Frame {
+   /**
+    * TODO: 这里的 Frame 应该用享元模式优化。后续优化...
+    */
+   public static class Frame {
 
       long beginTime;
 
+      long endTime;
+
       String methodDescription;
 
+   }
+
+   public interface Listener {
+      void onFramePop(@NonNull Frame frame);
    }
 
 }

@@ -15,7 +15,7 @@ object JarEntryReplaceUtils {
     /* Fields                                                  */
     /* ======================================================= */
 
-    private val logger = Logger.of("main", "JarEntryReplace")
+    private val logger = Logger.of("common", "replace")
 
 
 

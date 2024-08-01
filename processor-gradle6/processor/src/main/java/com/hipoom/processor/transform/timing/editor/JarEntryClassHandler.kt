@@ -4,20 +4,18 @@ import com.hipoom.processor.transform.timing.TimingConfig
 import javassist.ClassPool
 import javassist.CtClass
 import org.objectweb.asm.ClassReader
-import java.io.File
-import java.io.FileInputStream
+import java.io.InputStream
 
 /**
  * @author ZhengHaiPeng
- * @since 2024/7/28 10:41 上午
+ * @since 2024/7/29 21:43
  */
-object DirectoryClassHandler : AbsEditor() {
+class JarEntryClassHandler : AbsEditor() {
 
     /* ======================================================= */
     /* Override/Implements Methods                             */
     /* ======================================================= */
-
-    override fun getLoggerName() = "editor/directory"
+    override fun getLoggerName() = "editor/jar"
 
 
 
@@ -28,29 +26,26 @@ object DirectoryClassHandler : AbsEditor() {
     /**
      * 给这个类的所有函数都加上时间记录的代码。
      *
-     * @param fileInputStream 待处理的文件。
-     * @param outputDirectory 输出文件夹。
+     * @param inputStream 待处理的文件。
      *
-     * @return 是否已经将结果复制到输出目录了。
+     * @return 如果类被修改了，返回修改后类的二进制数据流。 否则，返回 null.
      */
     fun handleClass(
         configs: TimingConfig?,
-        fileInputStream: FileInputStream,
-        outputDirectory: File
-    ) {
+        inputStream: InputStream
+    ): ByteArray? {
         // 读取类信息
-        val reader = ClassReader(fileInputStream)
+        val reader = ClassReader(inputStream)
         val className = reader.className.replace('/', '.')
         log("", "")
         log("handleClass", "className: $className")
-        log("handleClass", "outputDirectory: " + outputDirectory.absolutePath)
         increaseIndent()
 
         // 忽略系统的类
         if (needIgnoreClassWithName(configs, className)) {
-            log("handleClass", "命中了黑名单，忽略这个类.")
+            log("handleClass", "命中黑名单，忽略这个类.")
             decreaseIndent()
-            return
+            return null
         }
 
         // 这里是解决内部类的类名包含$的问题，如果原始类名也包含$，则会出错(不考虑)
@@ -66,13 +61,13 @@ object DirectoryClassHandler : AbsEditor() {
         if (tempCls == null) {
             log("handleClass", "从 classPool 中找不到 $className 对应的类")
             decreaseIndent()
-            return
+            return null
         }
 
         if (tempCls.isInterface) {
             log("handleClass", "忽略接口.")
             decreaseIndent()
-            return
+            return null
         }
 
         log("handleClass", "即将处理类：$callableClassName")
@@ -83,16 +78,19 @@ object DirectoryClassHandler : AbsEditor() {
 
         // 如果有修改，写入到文件中
         if (hasModified) {
-            log("handleClass", "将修改后的 class 写入到文件中： ${outputDirectory.absolutePath}")
-            tempCls.writeFile(outputDirectory.absolutePath)
+            val bytes = tempCls.toBytecode()
 
             // detach 非常重要，避免出现多次插桩的情况。
             tempCls.detach()
+
+            decreaseIndent()
+            logger.flush()
+            return bytes
         }
 
         decreaseIndent()
         logger.flush()
-        return
+        return null
     }
 
 }

@@ -4,6 +4,9 @@ import com.android.build.api.transform.JarInput
 import com.android.build.api.transform.Status
 import com.hipoom.processor.common.Logger
 import com.hipoom.processor.common.of
+import java.io.File
+
+typealias OutputJarFile = File
 
 /**
  * @author ZhengHaiPeng
@@ -21,22 +24,22 @@ class JarScanner {
     /**
      * 没有变化的 Jar 包的处理逻辑。
      */
-    var notChangedJarHandler: ((JarInput)->Unit)? = null
+    var notChangedJarHandler: ((JarInput, OutputJarFile)->Unit)? = null
 
     /**
      * 新增的 Jar 包的处理逻辑。
      */
-    var addedJarHandler: ((JarInput)->Unit)? = null
+    var addedJarHandler: ((JarInput, OutputJarFile)->Unit)? = null
 
     /**
      * 移除的 Jar 包的处理逻辑。
      */
-    var removedJarHandler: ((JarInput)->Unit)? = null
+    var removedJarHandler: ((JarInput, OutputJarFile)->Unit)? = null
 
     /**
      * 有变化的 Jar 包的处理逻辑。
      */
-    var changedJarHandler: ((JarInput)->Unit)? = null
+    var changedJarHandler: ((JarInput, OutputJarFile)->Unit)? = null
 
 
 
@@ -44,9 +47,9 @@ class JarScanner {
     /* Public Methods                                          */
     /* ======================================================= */
 
-    fun scan(jar: JarInput) {
-        logger.info("处理 Jar 包：${jar.file.absolutePath}")
-        scanJar(jar)
+    fun scan(inputJar: JarInput, outputJar: File) {
+        logger.info("处理 Jar 包：${inputJar.file.absolutePath}")
+        scanJar(inputJar, outputJar)
     }
 
 
@@ -55,29 +58,29 @@ class JarScanner {
     /* Private Methods                                         */
     /* ======================================================= */
 
-    private fun scanJar(jar: JarInput) {
-        when (jar.status) {
+    private fun scanJar(inputJar: JarInput, outputJar: File) {
+        when (inputJar.status) {
             // 未改变的 Jar 包，从缓存中读取其信息
             Status.NOTCHANGED -> {
-                notChangedJarHandler?.invoke(jar)
+                notChangedJarHandler?.invoke(inputJar, outputJar)
                 return
             }
 
             // 新增的 Jar 包，直接处理，并添加到缓存
             Status.ADDED -> {
-                addedJarHandler?.invoke(jar)
+                addedJarHandler?.invoke(inputJar, outputJar)
                 return
             }
 
             // 移除的 Jar 包
             Status.REMOVED -> {
-                removedJarHandler?.invoke(jar)
+                removedJarHandler?.invoke(inputJar, outputJar)
                 return
             }
 
             // 有改变的 Jar 包，从缓存移除，重新分析
             Status.CHANGED -> {
-                changedJarHandler?.invoke(jar)
+                changedJarHandler?.invoke(inputJar, outputJar)
                 return
             }
             else -> {}

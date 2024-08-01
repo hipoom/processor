@@ -88,15 +88,15 @@ abstract class AbsInputScanner {
 
     private fun scanJar(transformInvocation: TransformInvocation, input: TransformInput) {
         val scanner = JarScanner()
-        scanner.notChangedJarHandler = { onVisitNotChangedJar(it) }
-        scanner.addedJarHandler = { onVisitAddedJar(it) }
-        scanner.removedJarHandler = { onVisitRemovedJar(it) }
-        scanner.changedJarHandler = { onVisitChangedJar(it) }
+        scanner.notChangedJarHandler = { i, o -> onVisitNotChangedJar(i, o) }
+        scanner.addedJarHandler = { i, o -> onVisitAddedJar(i, o) }
+        scanner.removedJarHandler = { i, o -> onVisitRemovedJar(i, o) }
+        scanner.changedJarHandler = { i, o -> onVisitChangedJar(i, o) }
 
-        input.jarInputs.forEach { jar ->
-            logger.info("当前处理Jar：" + jar.file.absolutePath)
+        input.jarInputs.forEach { inputJar ->
+            logger.info("当前处理Jar：" + inputJar.file.absolutePath)
 
-            val outputJar = jar.copyToOutput(transformInvocation.outputProvider)
+            val outputJar = inputJar.copyToOutput(transformInvocation.outputProvider)
             logger.info("已拷贝到输出目录：" + outputJar.absolutePath)
 
             // 如果不需要扫描文件夹，结束。
@@ -105,9 +105,8 @@ abstract class AbsInputScanner {
                 return@forEach
             }
 
-            scanner.scan(
-                jar = jar
-            )
+            // 扫描处理
+            scanner.scan(inputJar, outputJar)
         }
     }
 
@@ -159,7 +158,7 @@ abstract class AbsInputScanner {
      * 遍历 jar 时，遇到了没有变化的 jar.
      * 如果文件已经被 JarFilter 过滤了，则不会回调到这里。
      */
-    protected open fun onVisitNotChangedJar(jar: JarInput) {
+    protected open fun onVisitNotChangedJar(jar: JarInput, outputJar: File) {
 
     }
 
@@ -167,7 +166,7 @@ abstract class AbsInputScanner {
      * 遍历 jar 时，遇到了新增的 jar.
      * 如果文件已经被 JarFilter 过滤了，则不会回调到这里。
      */
-    protected open fun onVisitAddedJar(jar: JarInput) {
+    protected open fun onVisitAddedJar(jar: JarInput, outputJar: File) {
 
     }
 
@@ -175,7 +174,7 @@ abstract class AbsInputScanner {
      * 遍历 jar 时，遇到了移除的 jar.
      * 如果文件已经被 JarFilter 过滤了，则不会回调到这里。
      */
-    protected open fun onVisitRemovedJar(jar: JarInput) {
+    protected open fun onVisitRemovedJar(jar: JarInput, outputJar: File) {
 
     }
 
@@ -183,7 +182,7 @@ abstract class AbsInputScanner {
      * 遍历 jar 时，遇到了有变化的 jar.
      * 如果文件已经被 JarFilter 过滤了，则不会回调到这里。
      */
-    protected open fun onVisitChangedJar(jar: JarInput) {
+    protected open fun onVisitChangedJar(jar: JarInput, outputJar: File) {
 
     }
 
