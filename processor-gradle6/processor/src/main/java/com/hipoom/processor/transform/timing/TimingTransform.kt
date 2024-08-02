@@ -12,7 +12,10 @@ import com.hipoom.processor.common.flushAll
 import com.hipoom.processor.common.measureTime
 import com.hipoom.processor.common.of
 import com.hipoom.processor.project
+import com.hipoom.processor.transform.registry.RegistryTransform
 import com.hipoom.processor.transform.timing.scan.TimingScanner
+import java.io.PrintWriter
+import java.io.StringWriter
 
 /**
  * @author ZhengHaiPeng
@@ -47,20 +50,27 @@ class TimingTransform : Transform() {
         super.transform(transformInvocation)
         logger.info("TimingTransform 开始执行了.")
 
-        // 读取用户的配置
-        val configs = readConfigs()
-        logger.info("=========================")
-        logger.info("读取到的配置是")
-        logger.info("-------------------------")
-        val json = Gson().toJson(configs)
-        logger.info("\n$json")
-        logger.info("=========================")
+        try {
+            // 读取用户的配置
+            val configs = readConfigs()
+            logger.info("=========================")
+            logger.info("读取到的配置是")
+            logger.info("-------------------------")
+            val json = Gson().toJson(configs)
+            logger.info("\n$json")
+            logger.info("=========================")
 
-        // 开始执行 transform
-        val cost = measureTime {
-            onTransform(transformInvocation, configs)
+            // 开始执行 transform
+            val cost = measureTime {
+                onTransform(transformInvocation, configs)
+            }
+            logger.info("TimingTransform 耗时： $cost 毫秒")
+        } catch (e: Exception) {
+            val stringWriter = StringWriter()
+            val writer = PrintWriter(stringWriter)
+            e.printStackTrace(writer)
+            logger.warn("【异常】：$stringWriter")
         }
-        logger.info("TimingTransform 耗时： $cost 毫秒")
 
         // 所有日志写入文件。
         Logger.flushAll()

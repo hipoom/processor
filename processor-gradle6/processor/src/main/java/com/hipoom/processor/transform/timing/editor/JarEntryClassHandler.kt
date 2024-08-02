@@ -43,7 +43,7 @@ class JarEntryClassHandler : AbsEditor() {
 
         // 忽略系统的类
         if (needIgnoreClassWithName(configs, className)) {
-            log("handleClass", "命中黑名单，忽略这个类.")
+            log("handleClass", "忽略这个类.")
             decreaseIndent()
             return null
         }

@@ -75,4 +75,5 @@ dependencies {
 
     implementation "com.hipoom:registry:0.0.3"
     implementation "com.hipoom:files:0.0.3"
+    implementation "com.hipoom:performance:0.0.1"
 }

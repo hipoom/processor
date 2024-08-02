@@ -35,22 +35,19 @@ abstract class AbsEditor {
     protected fun needIgnoreClassWithName(configs: TimingConfig?, className: String): Boolean {
         increaseIndent()
 
-        val isPrefixMatched = configs?.blacklist?.prefix?.any {
-            className.startsWith(it)
-        } ?: false
-
-        if (isPrefixMatched) {
-            log("needIgnoreClassWithName", "前缀符合忽略条件.")
+        log("needIgnoreClassWithName", "判断是否匹配白名单")
+        val isMatchWhitelist = isMatchWhitelist(configs, className)
+        // 如果没有命中白名单，则忽略这个类
+        if (!isMatchWhitelist) {
+            log("needIgnoreClassWithName", "没有命中白名单.")
             decreaseIndent()
             return true
         }
 
-        val isContainsKeyWord = configs?.blacklist?.contains?.any {
-            className.contains(it)
-        } ?: false
-
-        if (isContainsKeyWord) {
-            log("needIgnoreClassWithName", "包含需要忽略的关键字，符合忽略条件.")
+        log("needIgnoreClassWithName", "判断是否命中黑名单")
+        val isMatchBlacklist = isMatchBlacklist(configs, className)
+        if (isMatchBlacklist) {
+            log("needIgnoreClassWithName", "命中黑名单，忽略这个类.")
             decreaseIndent()
             return true
         }
@@ -58,6 +55,68 @@ abstract class AbsEditor {
         val isTimingRecord = className.startsWith("com.hipoom.performance.timing.TimingRecorder")
         if (isTimingRecord) {
             log("needIgnoreClassWithName", "忽略 TimingRecorder 类.")
+            decreaseIndent()
+            return true
+        }
+
+        decreaseIndent()
+        return false
+    }
+
+    /**
+     * 是否匹配白名单。
+     *
+     * 如果没有配置白名单，或者白名单配置的是空，那么表明想要对所有类插桩。则返回 true;
+     */
+    private fun isMatchWhitelist(configs: TimingConfig?, className: String): Boolean {
+        increaseIndent()
+
+        // 如果没有配置白名单，那么等价于所有都要插桩。 所以想判断是否需要忽略，只需要在 whitelist 不为 null or empty 的时候判断。
+        val whitelist = configs?.whitelist ?: return true
+
+        // prefix 和 contains 都是空的时候，说明用户没有配置，没有配置则表示所有。
+        if (whitelist.prefix.isNullOrEmpty() && whitelist.contains.isNullOrEmpty()) {
+            log("isMatchWhitelist", "白名单中 prefix 和 contains 都是空的.")
+            decreaseIndent()
+            return true
+        }
+
+        // 如果配置了白名单，则需要匹配其中任意一个。
+        val isMatchPrefix = whitelist.prefix?.any { className.startsWith(it) } ?: false
+        if (isMatchPrefix) {
+            log("isMatchWhitelist", "白名单中 prefix 命中.")
+            decreaseIndent()
+            return true
+        }
+
+        decreaseIndent()
+        return configs.whitelist.contains?.any { className.contains(it) } ?: false
+    }
+
+    /**
+     * 是否命中黑名单了。
+     */
+    private fun isMatchBlacklist(configs: TimingConfig?, className: String): Boolean {
+        increaseIndent()
+
+        // 前缀是否命中黑名单
+        val isPrefixMatched = configs?.blacklist?.prefix?.any {
+            className.startsWith(it)
+        } ?: false
+
+        if (isPrefixMatched) {
+            log("isMatchBlacklist", "前缀符合忽略条件.")
+            decreaseIndent()
+            return true
+        }
+
+        // 是否命中关键字
+        val isContainsKeyWord = configs?.blacklist?.contains?.any {
+            className.contains(it)
+        } ?: false
+
+        if (isContainsKeyWord) {
+            log("needIgnoreClassWithName", "包含需要忽略的关键字，符合忽略条件.")
             decreaseIndent()
             return true
         }

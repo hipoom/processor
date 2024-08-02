@@ -1,6 +1,10 @@
 package com.hipoom.processor.common
 
+import com.hipoom.processor.transform.timing.TimingTransform
 import java.io.File
+import java.io.PrintWriter
+import java.io.StringWriter
+import java.lang.Exception
 import java.util.jar.JarEntry
 import java.util.jar.JarFile
 import java.util.jar.JarOutputStream
@@ -44,39 +48,50 @@ object JarEntryReplaceUtils {
     fun replaceAll(jar: File, needReplaceEntries: Map<String, ByteArray>) {
         logger.info("[replaceAll] jar: " + jar.absolutePath)
 
+        needReplaceEntries.keys.joinToString { "\n" + it }.let {
+            logger.info("[replaceAll]     需要替换的类包括:$it")
+        }
+
         if (!jar.exists()) {
-            logger.info("[replaceAll] 输入的文件不存在：$jar")
+            logger.info("[replaceAll]     输入的文件不存在：$jar")
             return
         }
 
         // 临时文件
         val temp = File(jar.absolutePath + ".tmp")
 
-        // 临时文件.JarOutputStream
-        val output = JarOutputStream(temp.outputStream())
+        try {
+            // 临时文件.JarOutputStream
+            val output = JarOutputStream(temp.outputStream())
 
-        val old = JarFile(jar)
+            val old = JarFile(jar)
 
-        // 遍历旧 jar 中的每一个元素，如果名字不匹配，直接复制到 output，如果名字匹配 entry，则用传入的 entryBytes 复制到 output.
-        val entries = old.entries()
-        while (entries.hasMoreElements()) {
-            val entry = entries.nextElement()
+            // 遍历旧 jar 中的每一个元素，如果名字不匹配，直接复制到 output，如果名字匹配 entry，则用传入的 entryBytes 复制到 output.
+            val entries = old.entries()
+            while (entries.hasMoreElements()) {
+                val entry = entries.nextElement()
 
-            // 如果 entry 需要被替换
-            if (needReplaceEntries.containsKey(entry.name)) {
-                // 写入新的 entry
-                val newEntry = JarEntry(entry.name)
-                output.putNextEntry(newEntry)
-                needReplaceEntries[entry.name]?.let { output.write(it) }
-                continue
+                // 如果 entry 需要被替换
+                if (needReplaceEntries.containsKey(entry.name)) {
+                    // 写入新的 entry
+                    val newEntry = JarEntry(entry.name)
+                    output.putNextEntry(newEntry)
+                    needReplaceEntries[entry.name]?.let { output.write(it) }
+                    continue
+                }
+
+                // 如果 entry 不需要被替换，拷贝元素
+                output.putNextEntry(entry)
+                old.getInputStream(entry).copyTo(output)
             }
 
-            // 如果 entry 不需要被替换，拷贝元素
-            output.putNextEntry(entry)
-            old.getInputStream(entry).copyTo(output)
+            output.close()
+            jar.delete() && temp.renameTo(jar)
+        } catch (e: Exception) {
+            val stringWriter = StringWriter()
+            val writer = PrintWriter(stringWriter)
+            e.printStackTrace(writer)
+            logger.warn("[replaceAll]    【异常】：$stringWriter")
         }
-
-        output.close()
-        jar.delete() && temp.renameTo(jar)
     }
 }
