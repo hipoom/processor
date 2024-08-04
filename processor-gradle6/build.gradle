@@ -14,7 +14,7 @@ buildscript {
         classpath "org.javassist:javassist:3.21.0-GA"
 
         // 在本地构建出 processor 之前，这里需要注释掉，否则会编译失败
-        classpath "com.hipoom:processor-gradle6:0.0.3"
+        // classpath "com.hipoom:processor-gradle6:0.0.3"
     }
 }
 

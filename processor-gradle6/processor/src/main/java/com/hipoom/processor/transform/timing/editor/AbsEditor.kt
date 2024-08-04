@@ -52,7 +52,8 @@ abstract class AbsEditor {
             return true
         }
 
-        val isTimingRecord = className.startsWith("com.hipoom.performance.timing.TimingRecorder")
+        // 对应这个功能的所有代码都不需要插桩。
+        val isTimingRecord = className.startsWith("com.hipoom.performance.timing.")
         if (isTimingRecord) {
             log("needIgnoreClassWithName", "忽略 TimingRecorder 类.")
             decreaseIndent()
