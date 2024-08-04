@@ -4,6 +4,7 @@ package com.hipoom.processor.common
 
 import com.hipoom.processor.pluginBuildDirectory
 import com.hipoom.processor.project
+import com.hipoom.processor.transform.timing.TimingTransform
 import org.gradle.api.logging.LogLevel
 import java.io.File
 import java.text.SimpleDateFormat
@@ -128,3 +129,13 @@ fun Logger.Companion.flushAll() {
 }
 
 val defLogger = Logger.of("main", "main")
+
+
+fun Logger.runThenLogTime(runnable: Runnable) {
+    // 开始执行 transform
+    val begin = System.currentTimeMillis()
+    runnable.run()
+    val end = System.currentTimeMillis()
+    val cost = end - begin
+    info("耗时： $cost 毫秒")
+}

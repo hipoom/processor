@@ -5,7 +5,7 @@ import com.android.build.api.transform.TransformOutputProvider
 import com.hipoom.processor.common.JarEntryReplaceUtils
 import com.hipoom.processor.common.Logger
 import com.hipoom.processor.common.of
-import com.hipoom.processor.transform.registry.TRANSFORM_NAME
+import com.hipoom.processor.transform.registry.TRANSFORM_REGISTRY
 import com.hipoom.processor.transform.registry.incremental.IncrementalCache
 import com.hipoom.processor.transform.registry.scan.ScanResult
 import javassist.ClassPool
@@ -23,7 +23,7 @@ object CodeEditor {
     /* Fields                                                  */
     /* ======================================================= */
 
-    private val logger = Logger.of(TRANSFORM_NAME, "editor")
+    private val logger = Logger.of(TRANSFORM_REGISTRY, "editor")
 
 
 
@@ -92,6 +92,8 @@ object CodeEditor {
 
         logger.info("包含 Registry 类的 jar 包的输入路径为：${IncrementalCache.jarContainsRegistry?.file?.absolutePath}")
         logger.info("包含 Registry 类的 jar 包的输出路径为：${output}")
+
+        // TODO: 这里需要把 input 复制到 output 吗？
 
         JarEntryReplaceUtils.replace(
             jar = output,

@@ -9,7 +9,7 @@ import com.hipoom.processor.common.toTraceString
 import com.hipoom.processor.pluginBuildDirectory
 import com.hipoom.processor.transform.registry.InputResult
 import com.hipoom.processor.transform.registry.RegistryTransformConfig
-import com.hipoom.processor.transform.registry.TRANSFORM_NAME
+import com.hipoom.processor.transform.registry.TRANSFORM_REGISTRY
 import java.io.File
 import java.text.SimpleDateFormat
 
@@ -24,7 +24,7 @@ object IncrementalCache {
     /* Fields                                                  */
     /* ======================================================= */
 
-    private val logger = Logger.of(TRANSFORM_NAME, "incremental")
+    private val logger = Logger.of(TRANSFORM_REGISTRY, "incremental")
 
     /**
      * 旧缓存
@@ -115,7 +115,7 @@ object IncrementalCache {
     /* ======================================================= */
 
     private fun getCacheFile(): File {
-        val file = File(pluginBuildDirectory, "$TRANSFORM_NAME/incremental/cache.json")
+        val file = File(pluginBuildDirectory, "$TRANSFORM_REGISTRY/incremental/cache.json")
         if (file.exists()) {
             return file
         }

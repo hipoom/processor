@@ -7,14 +7,17 @@ import com.android.build.gradle.internal.pipeline.TransformManager
 import com.google.gson.Gson
 import com.hipoom.processor.PluginConfigs
 import com.hipoom.processor.common.Logger
-import com.hipoom.processor.common.copyToOutput
+import com.hipoom.processor.common.PathHelper
+import com.hipoom.processor.common.copyInputsToOutputs
 import com.hipoom.processor.common.flushAll
 import com.hipoom.processor.common.of
 import com.hipoom.processor.project
 import com.hipoom.processor.transform.registry.edit.CodeEditor
 import com.hipoom.processor.transform.registry.incremental.IncrementalCache
 import com.hipoom.processor.transform.registry.scan.InputScanner
-import java.nio.file.Path
+import java.io.PrintStream
+import java.io.PrintWriter
+import java.io.StringWriter
 
 /**
  * @author ZhengHaiPeng
@@ -28,7 +31,7 @@ class RegistryTransform : Transform() {
     /* ======================================================= */
 
     companion object {
-        val logger = Logger.of(TRANSFORM_NAME, "main")
+        private val logger = Logger.of(TRANSFORM_REGISTRY, "main")
     }
 
 
@@ -37,7 +40,7 @@ class RegistryTransform : Transform() {
     /* Override/Implements Methods                             */
     /* ======================================================= */
 
-    override fun getName() = "registry"
+    override fun getName() = TRANSFORM_REGISTRY
 
     override fun getInputTypes(): MutableSet<QualifiedContent.ContentType> = TransformManager.CONTENT_CLASS
 
@@ -47,40 +50,46 @@ class RegistryTransform : Transform() {
 
     override fun transform(transformInvocation: TransformInvocation?) {
         super.transform(transformInvocation)
+        try {
+            logger.info("RegistryTransform 开始执行了.")
 
-        logger.info("RegistryTransform 开始执行了.")
+            // 加载缓存
+            IncrementalCache.load()
 
-        // 加载缓存
-        IncrementalCache.load()
+            // 读取用户的配置
+            val configs = readConfigs()
+            logger.info("=========================")
+            logger.info("读取到的配置是")
+            logger.info("-------------------------")
+            val json = Gson().toJson(configs)
+            logger.info("\n$json")
+            logger.info("=========================")
 
-        // 读取用户的配置
-        val configs = readConfigs()
-        logger.info("=========================")
-        logger.info("读取到的配置是")
-        logger.info("-------------------------")
-        val json = Gson().toJson(configs)
-        logger.info("\n$json")
-        logger.info("=========================")
+            // 如果配置是空的，不做处理，直接将 input 拷贝到 output
+            if (configs == null) {
+                transformInvocation?.copyInputsToOutputs()
+                Logger.flushAll()
+                return
+            }
 
-        // 如果配置是空的，不做处理，直接将 input 拷贝到 output
-        if (configs == null) {
-            copyToOutputOnly(transformInvocation)
+            // 开始执行 transform
+            val begin = System.currentTimeMillis()
+            onTransform(transformInvocation, configs)
+            val end = System.currentTimeMillis()
+            val cost = end - begin
+            logger.info("耗时： $cost 毫秒")
+
+            // 保存配置
+            IncrementalCache.store(configs)
+
+            // 所有日志写入文件。
             Logger.flushAll()
-            return
+        } catch (e: Exception) {
+            val stringWriter = StringWriter()
+            val writer = PrintWriter(stringWriter)
+            e.printStackTrace(writer)
+            logger.warn("【异常】：$stringWriter")
         }
-
-        // 开始执行 transform
-        val begin = System.currentTimeMillis()
-        onTransform(transformInvocation, configs)
-        val end = System.currentTimeMillis()
-        val cost = end - begin
-        logger.info("耗时： $cost 毫秒")
-
-        // 保存配置
-        IncrementalCache.store(configs)
-
-        // 所有日志写入文件。
-        Logger.flushAll()
     }
 
 
@@ -126,20 +135,6 @@ class RegistryTransform : Transform() {
         return transformConfig
     }
 
-    private fun copyToOutputOnly(transformInvocation: TransformInvocation?) {
-        transformInvocation?.inputs?.forEach { input ->
-            // 遍历每一个文件夹
-            input.directoryInputs.forEach { directory ->
-                directory.copyToOutput(transformInvocation.outputProvider)
-            }
-
-            // 遍历每一个 Jar
-            input.jarInputs.forEach { jar ->
-                jar.copyToOutput(transformInvocation.outputProvider)
-            }
-        }
-    }
-
     private fun showConfigHint() {
         logger.info(
         """
@@ -162,7 +157,7 @@ class RegistryTransform : Transform() {
         // 如果配置的注解、接口列表为空，不再处理
         if (!config.hasUserConfigured()) {
             logger.info("配置是空的，不做处理，直接将 input 拷贝到 output")
-            copyToOutputOnly(transformInvocation)
+            transformInvocation?.copyInputsToOutputs()
             return
         }
 

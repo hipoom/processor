@@ -2,17 +2,27 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 
-//apply plugin: 'hipoom'
-//hipoom {
-//    registry {
-//        interfaces = [
-//                "com.hipoom.processor.TestInterface",
-//                "androidx.appcompat.app.AppCompatCallback"
-//        ]
-//        needTrackSuperClassForInterface = false
-//        annotations = ["com.hipoom.processor.TestAnnotation"]
-//    }
-//}
+apply plugin: 'hipoom'
+hipoom {
+    registry {
+        interfaces = [
+                "com.hipoom.processor.TestInterface",
+                "androidx.appcompat.app.AppCompatCallback"
+        ]
+        needTrackSuperClassForInterface = false
+        annotations = ["com.hipoom.processor.TestAnnotation"]
+    }
+
+    timing {
+        enable = true
+
+        // 黑名单 - 官方库中的类，不参与插桩，提高效率
+        blacklist.prefix = ["kotlin.", "kotlinx.", "com.android.", "androidx."]
+
+        // 黑名单 - 类似于 .R$id、.R$layout 这些类，不参与插桩
+        blacklist.contains = [".R\$", "OnFramePopListener"]
+    }
+}
 
 android {
     compileSdkVersion 30
@@ -64,4 +74,6 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.2.0'
 
     implementation "com.hipoom:registry:0.0.3"
+    implementation "com.hipoom:files:0.0.3"
+    implementation "com.hipoom:performance:0.0.1"
 }

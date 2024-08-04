@@ -5,7 +5,7 @@ import com.hipoom.processor.common.Logger
 import com.hipoom.processor.common.of
 import com.hipoom.processor.transform.registry.InputResult
 import com.hipoom.processor.transform.registry.RegistryTransformConfig
-import com.hipoom.processor.transform.registry.TRANSFORM_NAME
+import com.hipoom.processor.transform.registry.TRANSFORM_REGISTRY
 
 /**
  * @author ZhengHaiPeng
@@ -17,7 +17,7 @@ object InputScanner {
     /* Fields                                                  */
     /* ======================================================= */
 
-    private val logger by lazy { Logger.of(TRANSFORM_NAME, "scan") }
+    private val logger by lazy { Logger.of(TRANSFORM_REGISTRY, "scan") }
 
 
 
